@@ -1,0 +1,256 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+:root{
+    --linear-grad : linear-gradient(to right, #141E30, #243B55);
+    --gradien1 : #141E30;
+    --gradien2 : #243B55;
+}
+*{
+    margin: 0;
+    box-sizing: border-box;
+    padding: 0;
+}
+body{
+    height: 100vh;
+    display: grid;
+    background: #f6f5f7;
+    place-content: center;
+    font-family: 'Poppins', sans-serif;
+}
+.container{
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    width: 850px;
+    height: 500px;
+    background-color: white;
+    box-shadow: 25px 30px 55px #5557;
+    border-radius: 13px;
+    overflow: hidden;
+}
+.form{
+    position: absolute;
+    width: 60%;
+    height: 100%;
+    padding: 0px 40px;
+}
+form{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0px 50px;
+}
+h1{
+    color: var(--gradien1);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+.input-field{
+    position: relative;
+    margin: 8px 0px;
+    width: 100%;
+}
+input{
+    width: 100%;
+    padding: 12px 15px;
+    background-color: #fafafa;
+    border: none;
+    outline: none;
+}
+label{
+    position: absolute;
+    left: 50%;
+    top: 100%;
+    transform: translateX(200%);
+    width: 100%;
+    height: 2px;
+    background: var(--linear-grad);
+    transition: 0.3s ease-in-out;
+}
+input:focus ~ label{
+    transform: translateX(-50%);
+}
+a{
+    color: #333;
+    font-size: 14px;
+    text-decoration: none;
+    margin: 15px 0px;
+}
+a.lupa-pass{
+    padding-bottom: 3px;
+    border-bottom: 2px solid #eee;
+}
+.form .btn-login{
+    border-radius: 20px;
+    border: 1px solid var(--gradien1);
+    background: var(--gradien2);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-top: 1rem;
+    width: 40%;
+}
+.form .btn-login:hover{
+    background: white;
+    color: var(--gradien1);
+}
+.overlay{
+    position: absolute;
+    top: 0;
+    left: 60%;
+    width: 40%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--linear-grad);
+    color: white;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0px 40px;
+    text-align: center;
+}
+.overlay h1{
+    font-size: 1.9rem;
+    color: white;
+}
+p{
+    font-size: 0.9rem;
+    font-weight: 300;
+    line-height: 1.5rem;
+    letter-spacing: 0.5px;
+    margin: 1.5rem 0rem 3.2rem;
+}
+
+@media (max-width: 1366px){
+    html {
+        font-size: 90%;
+    }
+}
+@media (max-width: 785px){
+    html {
+        font-size: 70%;
+    }
+    .overlay{
+        display: none;
+    }
+    .form{
+        width: 110%;
+    }
+    .container{
+        position: absolute;
+        width: 90%;
+        margin-left: 2.5rem;
+        margin-right: 2rem;
+        margin-top: 5rem;
+        align-items: center;
+        justify-content: center;
+    }
+}
+@media (max-width: 479px){
+    html {
+        font-size: 55%;
+    }
+}
+
+
+/* MY CUSTOM ANIMATION */
+.fadeInLeft{
+    -webkit-animation: fadeInLeft 2s both;
+    -moz-animation: fadeInLeft 2s both;
+    -o-animation: fadeInLeft 2s both;
+    animation: fadeInLeft 2s both; 
+}
+
+.fadeInRight{
+    -webkit-animation: fadeInRight 2s both;
+    -moz-animation: fadeInRight 2s both;
+    -o-animation: fadeInRight 2s both;
+    animation: fadeInRight 2s both; 
+}
+
+@-webkit-keyframes fadeInLeft{
+    0%{
+        opacity: 0;
+        -webkit-transform: translateX(-100px);
+    }
+    100%{
+        opacity: 1;
+        -webkit-transform: translateX(0);
+    }
+}
+@-moz-keyframes fadeInLeft{
+    0%{
+        opacity: 0;
+        -moz-transform: translateX(-100px);
+    }
+    100%{
+        opacity: 1;
+        -moz-transform: translateX(0);
+    }
+}
+@-o-keyframes fadeInLeft{
+    0%{
+        opacity: 0;
+        -o-transform: translateX(-100px);
+    }
+    100%{
+        opacity: 1;
+        -o-transform: translateX(0);
+    }
+}
+@keyframes fadeInLeft{
+    0%{
+        opacity: 0;
+        transform: translateX(-100px);
+    }
+    100%{
+        opacity: 1;
+        transform: translateX(0);
+    } 
+}
+
+@-webkit-keyframes fadeInRight{
+    0%{
+        opacity: 0;
+        -webkit-transform: translateX(100px);
+    }
+    100%{
+        opacity: 1;
+        -webkit-transform: translateX(0);
+    }
+}
+@-moz-keyframes fadeInRight{
+    0%{
+        opacity: 0;
+        -moz-transform: translateX(100px);
+    }
+    100%{
+        opacity: 1;
+        -moz-transform: translateX(0);
+    }
+}
+@-o-keyframes fadeInRight{
+    0%{
+        opacity: 0;
+        -o-transform: translateX(100px);
+    }
+    100%{
+        opacity: 1;
+        -o-transform: translateX(0);
+    }
+}
+@keyframes fadeInRight{
+    0%{
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    100%{
+        opacity: 1;
+        transform: translateX(0);
+    } 
+}
