@@ -18,7 +18,7 @@
             $_SESSION['username'] = $_POST['username'];
             $_SESSION['password'] = $_POST['password'];
 
-            header("Location: index.php");
+            header("Location: index.php?page=index");
         }
     }
 ?>
@@ -42,8 +42,8 @@
     <div class="container">
         <div class="form fadeInLeft">
             <form action="" method="POST">
-                <h1>Masuk dengan Akun Anda</h1>
-                <div class="err" style="display: <?php echo isset($_POST['login']) ? ($is_valid['cekLoginPegawai'] == 1 ? 'none' : 'block') : 'none'; ?>; color: red; float: left;">Username dan password salah</div>
+                <h1>Login dengan akun Anda</h1>
+                <div class="err" style="display: <?php echo isset($_POST['login']) ? ($is_valid['cekLoginPegawai'] == 1 ? 'none' : 'block') : 'none'; ?>; color: red; float: left;">Username atau password salah</div>
 
                 <div class="input-field">
                     <input type="text" name="username" placeholder="Username" required>

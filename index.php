@@ -56,7 +56,7 @@
 
                 <div class="card">
                     <div class="card-header">
-                        ASET: Kendaraan
+                        <h5 class="fw-bold">ASET: Kendaraan</h5>
                     </div>
                     <div class="card-body container-fluid">
 

@@ -1,16 +1,12 @@
 <?php
-include 'koneksi_db.php';
-?>
-<?php 
-    if (isset($_GET['opr'])){
-        $opr = $_GET['opr'];
-        if ($opr == 'delete'){
-            $idMobilHapus = (int)$_GET['idMobil'];
-            if (isset($_GET['confirmDelete']) ?? false) {
-                $query = "DELETE FROM mobil WHERE id_mobil='$idMobilHapus'";
-                $deletionRes = mysqli_query($koneksi, $query);
-            }
-        }
+    include 'koneksi_db.php';
+    @session_start();
+
+    if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
+        @header("Location: login.php");
+    }
+    else {
+        @header("Location: index.php?page=daftar_mobil");
     }
 ?>
 <!DOCTYPE html>
@@ -27,53 +23,25 @@ include 'koneksi_db.php';
 
 <body>
     <?php
-    if (isset($_GET['opr'])) :
-        $opr = $_GET['opr'];
-        if ($opr == 'edit') :
-            $query = "SELECT * FROM mobil WHERE id_mobil =" . $_GET['idMobil'];
-            $dataEditMobil = mysqli_fetch_assoc(mysqli_query($koneksi, $query));
-    ?>
-            <script>
-                window.onload = function() {
-                    var editMobilModal = new bootstrap.Modal(document.getElementById('formEditMobil'));
-                    editMobilModal.show();
-                }
-            </script>
-        <?php elseif ($opr == 'delete' && !isset($_GET['confirmDelete'])) : ?>
-            <script>
-                Swal.fire({
-                    title: 'Konfirmasi Penghapusan',
-                    text: "Apakah Anda yakin ingin menghapus data mobil ini?",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Iya',
-                    cancelButtonText: 'Batal'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        Swal.fire({
-                            title: 'Berhasil',
-                            text: 'Data Mobil Berhasil Dihapus',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = "index.php?page=daftar_mobil&opr=delete&idMobil=<?=$idMobilHapus?>&confirmDelete=true";
-                            }
-                            window.locaion.href = "index.php?page=daftar_mobil";
-                        })
-                    };
-                })
-            </script>
-        <?php endif ?>
-    <?php endif ?>
+        $query = "SELECT * FROM view_semua_mobil";
+        $result = mysqli_fetch_all(mysqli_query($koneksi, $query));
 
-    <?php
-    $query = "SELECT * FROM view_semua_mobil";
-    $result = mysqli_fetch_all(mysqli_query($koneksi, $query));
+        if (isset($_GET['confirmDelete'])):
+            $id_mobil = $_GET['idMobil'];
+            $query = "DELETE FROM mobil WHERE id_mobil='$id_mobil'";
+            $deletionRes = mysqli_query($koneksi, $query);
+        ?>
+
+        <script>
+            window.location.href = "index.php?page=daftar_mobil";
+        </script>
+
+        <?php endif; 
     ?>
     <div class="card">
+        <div class="card-header">
+            <h2>Daftar Kendaraan</h2>
+        </div>
         <div class="card-body">
             <table class="table table-hover table-striped">
                 <thead>
@@ -87,8 +55,8 @@ include 'koneksi_db.php';
                         <th style="width: 12%;">Kapasitas Penumpang</th>
                         <th>Harga Sewa</th>
                         <th>Status</th>
-                        <th style="width: 0%;"></th>
-                        <th style="width: 0%;"></th>
+                        <th style="width: 4%;"></th>
+                        <th style="width: 4%;"></th>
                         <th style="width: 5%;"></th>
                     </tr>
                 </thead>
@@ -107,16 +75,18 @@ include 'koneksi_db.php';
                         echo "<td>" . $row[7] . "</td>";
                         echo "<td>" . $row[8] . "</td>";
                         echo '<td><button type="button" class="btn btn-primary btn-sm">Details</button></td>';
-                        echo '<td><a href="index.php?page=daftar_mobil&opr=edit&idMobil=' . $row[0] . '"><button type="button" class="btn btn-warning btn-sm">Edit</button></a></td>';
-                        echo '<td><a href="index.php?page=daftar_mobil&opr=delete&idMobil=' . $row[0] . '"><button type="button" class="btn btn-danger btn-sm">Delete</button></td>';
+                        echo '<form action="" method="post">';
+                        echo '<input type="text" name="manipulate_id_mobil" value="' .$row[0] .'" style="display: none;">';
+                        echo '<td><button type="submit" class="btn btn-warning btn-sm" name="edit"><i class="fa-solid fa-pen fa-2xs"></i> Edit</button></td>';
+                        echo '<td><button type="submit" class="btn btn-danger btn-sm" name="delete"><i class="fa-solid fa-trash-can fa-2xs"></i> Delete</button></td>';
+                        echo '</form>';
                     }
                     ?>
                 </tbody>
             </table>
 
             <!-- MODAL TAMBAH MOBIL -->
-            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#formTambahMobil">Tambah Mobil</button>
-
+            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#formTambahMobil">Tambah Mobil <i class="fa-solid fa-plus fa-lg" style="margin-left: 0.2rem;"></i></button>
             <div class="modal fade" id="formTambahMobil" tabindex="-1" aria-labelledby="formTambahMobilLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                     <div class="modal-content">
@@ -192,6 +162,21 @@ include 'koneksi_db.php';
             </div>
 
             <!-- MODAL EDIT MOBIL -->
+            <?php 
+                if (isset($_POST['edit'])):
+                    $id_mobil = $_POST['manipulate_id_mobil'];
+                    $query = "SELECT * FROM mobil WHERE id_mobil =" .$id_mobil;
+                    $dataEditMobil = mysqli_fetch_assoc(mysqli_query($koneksi, $query));
+                ?>
+                <script>
+                    window.onload = function() {
+                        var editMobilModal = new bootstrap.Modal(document.getElementById('formEditMobil'));
+                        editMobilModal.show();
+                    }
+                </script>
+            <?php endif ?>
+
+
             <div class="modal fade" id="formEditMobil" tabindex="-1" aria-labelledby="formEditMobilLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                     <div class="modal-content">
@@ -256,50 +241,119 @@ include 'koneksi_db.php';
                                         <option value="not ready" <?php echo $dataEditMobil['status'] == 'not ready' ? 'selected' : ''; ?>>Not Ready</option>
                                     </select>
                                 </div>
-                            </form>
-                        </div>
 
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel">Batal</button>
-                            <button class="btn btn-primary" type="submit" name="edit" value="Edit" id="edit">Edit</button>
+                                <div class="modal-footer">
+                                    <input type="text" name="edit_id_mobil" value="<?=$id_mobil?>" style="display: none;">
+                                    <a href=""><button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel">Batal</button></a>
+                                    <button class="btn btn-primary" type="submit" name="saveEdit" value="saveEdit" id="edit">Edit</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <script>
 
-    </script>
-    <?php if (isset($_POST['submit'])) :
-        $namaMobil = $_POST['nama_mobil'];
-        $tahun = $_POST['tahun'];
-        $transmisi = $_POST['transmisi'];
-        $platNomor = $_POST['plat_nomor'];
-        $jenisMobil = $_POST['jenis_mobil'];
-        $kapasitasPenumpang = $_POST['kapasitas_pnp'];
-        $hargaSewa = $_POST['harga_sewa'];
-        $status = $_POST['status_mobil'];
 
-        // echo $transmisi;
-        $query = "CALL TambahMobilBaru('$namaMobil', '$tahun', '$platNomor', '$jenisMobil', '$kapasitasPenumpang', '$hargaSewa', '-', '$status', '$transmisi')";
-        $result = mysqli_query($koneksi, $query);
-    ?>
+    <?php 
+        if (isset($_POST['submit'])) :
+            $namaMobil = $_POST['nama_mobil'];
+            $tahun = $_POST['tahun'];
+            $transmisi = $_POST['transmisi'];
+            $platNomor = $_POST['plat_nomor'];
+            $jenisMobil = $_POST['jenis_mobil'];
+            $kapasitasPenumpang = $_POST['kapasitas_pnp'];
+            $hargaSewa = $_POST['harga_sewa'];
+            $status = $_POST['status_mobil'];
 
-        <!-- SWEETALERT Berhasil Menambahkan Data -->
-        <script>
-            Swal.fire({
-                title: 'Berhasil',
-                text: 'Data Mobil Berhasil Ditambahkan',
-                icon: 'success',
-                confirmButtonText: 'OK'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = "index.php?page=daftar_mobil";
-                }
-            })
-        </script>
-    <?php endif ?>
+            // echo $transmisi;
+            $query = "CALL TambahMobilBaru('$namaMobil', '$tahun', '$platNomor', '$jenisMobil', '$kapasitasPenumpang', '$hargaSewa', '-', '$status', '$transmisi')";
+            $result = mysqli_query($koneksi, $query);
+            ?>
+            <!-- SWEETALERT Berhasil Menambahkan Data -->
+            <script>
+                Swal.fire({
+                    title: 'Berhasil',
+                    text: 'Data Mobil Berhasil Ditambahkan',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "index.php?page=daftar_mobil";
+                    }
+                })
+            </script>
+        <?php endif; ?>
+        
+        <?php
+        if (isset($_POST['saveEdit'])):
+            $namaMobil = $_POST['nama_mobil'];
+            $tahun = $_POST['tahun'];
+            $transmisi = $_POST['transmisi'];
+            $platNomor = $_POST['plat_nomor'];
+            $jenisMobil = $_POST['jenis_mobil'];
+            $kapasitasPenumpang = $_POST['kapasitas_pnp'];
+            $hargaSewa = $_POST['harga_sewa'];
+            $status = $_POST['status_mobil'];
+
+            $id_mobil_to_edit = $_POST['edit_id_mobil'];
+
+            $query = "CALL UpdateDataMobil ('$id_mobil_to_edit', '$namaMobil', '$tahun', '$transmisi', '$platNomor', '$jenisMobil', '$kapasitasPenumpang', '$hargaSewa', '$status')";
+            $result = mysqli_query($koneksi, $query);
+            
+            ?>
+            <script>
+                Swal.fire({
+                    title: 'Berhasil',
+                    text: 'Data Mobil Berhasil Diupdate',
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = "index.php?page=daftar_mobil";
+                    }
+                })
+            </script>
+        <?php endif; ?>
+
+        <?php
+            if (isset($_POST['delete'])):
+                $manipulate_id_mobil = $_POST['manipulate_id_mobil'];
+                ?>
+                <script>
+                    window.onload = function() {
+                        Swal.fire({
+                        title: 'Konfirmasi Penghapusan',
+                        text: "Apakah Anda yakin ingin menghapus data mobil ini?",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Iya',
+                        cancelButtonText: 'Batal'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                Swal.fire({
+                                    title: 'Berhasil',
+                                    text: 'Data Mobil Berhasil Dihapus',
+                                    icon: 'success',
+                                    confirmButtonText: 'OK'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        window.location.href = "index.php?page=daftar_mobil&confirmDelete=true&idMobil=<?=$manipulate_id_mobil?>";
+                                    }
+                                })
+                            }
+                            else if (result.dismiss === Swal.DismissReason.cancel) {
+                                window.location.href = "index.php?page=daftar_mobil";
+                            }
+                        })
+                    }
+                </script>
+
+        <?php endif; ?>
+
 </body>
 
 </html>
