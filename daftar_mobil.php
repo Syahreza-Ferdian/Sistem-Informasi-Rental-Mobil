@@ -6,6 +6,12 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
     @header("Location: login.php");
 } else {
     @header("Location: index.php?page=daftar_mobil");
+    if ($_SESSION['isOwner'] == 1) {
+        $hiddenFromPegawai = false;
+    }
+    else {
+        $hiddenFromPegawai = true;
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -40,7 +46,7 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
     <div class="card">
         <div class="card-header">
             <h2>Daftar Kendaraan</h2>
-            <div class="float-end w-25 mb-3">
+            <div class="float-lg-end mb-3">
                 <form action="" method="get">
                     <div class="input-group input-group">
                         <input type="hidden" name="page" value="daftar_mobil">
@@ -60,6 +66,7 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
                 INNER JOIN jenis_mobil JM ON M.id_jenis = JM.id_jenis
                 WHERE M.nama_mobil LIKE CONCAT('%', '$searchParam', '%')
                 OR M.plat_nomor LIKE CONCAT('%', '$searchParam', '%')
+                OR M.tahun LIKE CONCAT('%', '$searchParam', '%')
                 ORDER BY M.id_mobil";
 
                 $searchResult = mysqli_query($koneksi, $query);
@@ -71,7 +78,7 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
             endif;
         ?>
 
-        <div class="card-body">
+        <div class="card-body table-responsive">
             <?php
                 if (!$result): ?>
                     <div class="container text-center">Data tidak ditemukan</div>
@@ -94,8 +101,8 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
                         <th>Harga Sewa</th>
                         <th>Status</th>
                         <th style="width: 4%;"></th>
-                        <th style="width: 4%;"></th>
-                        <th style="width: 5%;"></th>
+                        <th style="width: 4%;" <?php echo $hiddenFromPegawai ? 'hidden' : '' ?>></th>
+                        <th style="width: 5%;" <?php echo $hiddenFromPegawai ? 'hidden' : '' ?>></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -115,8 +122,8 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
                         echo '<form action="" method="post">';
                         echo '<input type="text" name="manipulate_id_mobil" value="' . $row[0] . '" style="display: none;">';
                         echo '<td><button type="submit" class="btn btn-primary btn-sm" name="details">Details</button></td>';
-                        echo '<td><button type="submit" class="btn btn-warning btn-sm" name="edit"><i class="fa-solid fa-pen fa-2xs"></i> Edit</button></td>';
-                        echo '<td><button type="submit" class="btn btn-danger btn-sm" name="delete"><i class="fa-solid fa-trash-can fa-2xs"></i> Delete</button></td>';
+                        echo '<td><button type="submit" class="btn btn-warning btn-sm" name="edit" ', $hiddenFromPegawai ? 'hidden' : '', '><i class="fa-solid fa-pen fa-2xs"></i> Edit</button></td>';
+                        echo '<td><button type="submit" class="btn btn-danger btn-sm" name="delete" ', $hiddenFromPegawai ? 'hidden' : '', '><i class="fa-solid fa-trash-can fa-2xs"></i> Delete</button></td>';
                         echo '</form></tr>';
                     }
                     ?>
@@ -125,7 +132,7 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
             <?php endif; ?>
 
             <!-- MODAL TAMBAH MOBIL -->
-            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#formTambahMobil" <?php echo isset($_GET['cari_mobil']) ? 'hidden' : '' ?> ><strong>Tambah Mobil</strong> <i class="fa-solid fa-plus fa-lg" style="margin-left: 0.2rem;"></i></button>
+            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#formTambahMobil" <?php echo isset($_GET['cari_mobil']) || $hiddenFromPegawai ? 'hidden' : '' ?> ><strong>Tambah Mobil</strong> <i class="fa-solid fa-plus fa-lg" style="margin-left: 0.2rem;"></i></button>
             <div class="modal fade" id="formTambahMobil" tabindex="-1" aria-labelledby="formTambahMobilLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                     <div class="modal-content">

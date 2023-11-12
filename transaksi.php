@@ -20,14 +20,14 @@
 </head>
 
 <body>
-    <div class="container text-center">
+    <div class="container">
         <!-- <hr>
         <h1>This Page Under Development</h1>
         <img src="https://i.postimg.cc/k5NJmHZG/image.png" alt="" srcset="">
         <hr> -->
 
         <div class="card" style="margin-top: 1rem;">
-            <div class="card-header">
+            <div class="card-header text-center">
                 <h2>Daftar Transaksi</h2>
             </div>
 
@@ -78,6 +78,41 @@
                         ?>
                     </tbody>
                 </table>
+
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#formTambahTransaksi"><strong>Tambah transaksi baru</strong> <i class="fa-solid fa-plus fa-lg"></i> </button>
+                <div class="modal fade" id="formTambahTransaksi" tabindex="-1" aria-labelledby="formTambahTransaksi" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5" id="formTambahMobil">Masukkan Data Transaksi Baru</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+
+                            <div class="modal-body">
+                                <form action="" method="POST">
+                                    <div class="form-floating">
+                                        <input type="text" name="nama_customer" id="customer_name" class="form-control" placeholder="Nama Customer" required>
+                                        <label for="customer_name">Nama Customer</label>
+                                    </div>
+                                    <br>
+                                    <div class="form-floating">
+                                        <input type="text" name="alamat_customer" id="customer_address" class="form-control" placeholder="Alamat Customer" required>
+                                        <label for="customer_address">Alamat Customer</label>
+                                    </div>
+                                    <br>
+                                    <div class="form-floating">
+                                        <input type="number" name="nomor_telp_customer" id="nomor_telp_customer" class="form-control" placeholder="Nomor Telepon" required>
+                                        <label for="nomor_telp_customer">Nomor Telepon Customer</label>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel">Batal</button>
+                                        <button class="btn btn-primary" type="submit" name="submit" value="Submit" id="save">Simpan</button>  <!-- NEXT = KE FORM TAMBAH TRANSAKSI -->
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

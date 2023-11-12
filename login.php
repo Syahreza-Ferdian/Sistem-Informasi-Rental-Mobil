@@ -15,8 +15,13 @@
         $is_valid = mysqli_fetch_assoc($cek_kredensial);
 
         if ($cek_kredensial && $is_valid['cekLoginPegawai'] == 1) {
-            $_SESSION['username'] = $_POST['username'];
+            $user = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT id_pegawai, username, isOwner FROM pegawai WHERE username = '$p_username'"));
+            $resUser = $user['id_pegawai'];
+            $isOwner = $user['isOwner'];
+
+            $_SESSION['username'] = $user['username'];
             $_SESSION['password'] = $_POST['password'];
+            $_SESSION['isOwner'] = $isOwner;
 
             header("Location: index.php?page=index");
         }
