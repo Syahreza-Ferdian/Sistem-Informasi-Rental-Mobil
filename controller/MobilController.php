@@ -44,6 +44,8 @@ class MobilController extends Controller {
         $model = new MobilModel();
 
         $result = $model->tambah_mobil($_POST);
+        
+        header("Location: " .base_url ."/mobil");
     }
 
     public function showDetail() {
@@ -79,5 +81,15 @@ class MobilController extends Controller {
 
         $model = new MobilModel();
         $result = $model->update_mobil($id_mobil_to_edit, $namaMobil, $tahun, $transmisi, $platNomor, $jenisMobil, $kapasitasPenumpang, $hargaSewa, $status);
+
+        header("Location: " .base_url ."/mobil");
+    }
+
+    public function delete_confirm() {
+        $model = new MobilModel();
+
+        $result = $model->delete_mobil($_POST['manipulate_id_mobil']);
+
+        header("Location: " .base_url ."/mobil");
     }
 }

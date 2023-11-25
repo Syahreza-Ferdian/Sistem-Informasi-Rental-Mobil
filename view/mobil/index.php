@@ -72,20 +72,22 @@ if ($_SESSION['isOwner'] == 1) {
                             echo "<td>" . $row[6] . "</td>";
                             echo "<td>" . $row[7] . "</td>";
                             echo "<td>" . ucwords($row[8]) . "</td>";
-                            echo '<form action="" method="post" id="control_form">';
+                            echo '<form action="" method="post" class="control_form">';
                             echo '<input type="text" name="manipulate_id_mobil" value="' . $row[0] . '" style="display: none;">';
                             echo '<td><button type="submit" class="btn btn-primary btn-sm" name="details">Details</button></td>';
                             echo '<td><button type="submit" class="btn btn-warning btn-sm" name="edit" ', $hiddenFromPegawai ? 'hidden' : '', '><i class="fa-solid fa-pen fa-2xs"></i> Edit</button></td>';
-                            echo '<td><button type="submit" class="btn btn-danger btn-sm" name="delete" ', $hiddenFromPegawai ? 'hidden' : '', '><i class="fa-solid fa-trash-can fa-2xs"></i> Delete</button></td>';
-                            echo '</form></tr>';
+                            echo '<td></form><button type="button" class="btn btn-danger btn-sm" onclick="showDeleteConfirm(' . $row[0] . ')" name="delete" ', $hiddenFromPegawai ? 'hidden' : '', '><i class="fa-solid fa-trash-can fa-2xs"></i> Delete</button></td>';
+                            echo '</tr>';
                         }
                         ?>
                     </tbody>
                 </table>
 
+                <!-- <button type="button" onclick="showDeleteConfirm()">DELETE</button> -->
+
                 <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#formTambahMobil" <?php echo isset($data['searchParam']) || $hiddenFromPegawai ? 'hidden' : '' ?>><strong>Tambah Mobil</strong> <i class="fa-solid fa-plus fa-lg" style="margin-left: 0.2rem;"></i></button>
 
-
+                <!-- LOGIC RELATED TO TAMBAH MOBIL -->
                 <!-- MODAL TAMBAH MOBIL -->
                 <div class="modal fade" id="formTambahMobil" tabindex="-1" aria-labelledby="formTambahMobilLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
@@ -173,31 +175,20 @@ if ($_SESSION['isOwner'] == 1) {
                             confirmButtonText: 'OK'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                sendPostRequest();
-                                window.location.href = "<?= base_url ?>/mobil";
+                                // sendPostRequest();
+                                var xhr = new XMLHttpRequest();
+                                var formData = new FormData(document.getElementById("tambahForm"));
+
+                                xhr.open("POST", "<?= base_url ?>/mobil/tambah", true);
+                                xhr.send(formData);
+
+                                window.location.replace("<?= base_url ?>/mobil");
                             }
                         });
-
-                        function sendPostRequest() {
-                            var xhr = new XMLHttpRequest();
-                            var formData = new FormData(document.getElementById("tambahForm"));
-
-                            xhr.onreadystatechange = function() {
-                                if (xhr.readyState === XMLHttpRequest.DONE) {
-                                    if (xhr.status === 200) {
-                                        console.log('XHR successful'); //untuk ngetest
-                                    } else {
-                                        console.error('XHR error');
-                                    }
-                                }
-                            };
-
-                            xhr.open("POST", "<?= base_url ?>/mobil/tambah", true);
-                            xhr.send(formData);
-                        }
                     });
                 </script>
 
+                <!-- LOGIC RELATED TO DETAIL MOBIL -->
                 <?php
                 if (isset($_POST['details'])) :
                     $c = new MobilController();
@@ -240,7 +231,7 @@ if ($_SESSION['isOwner'] == 1) {
                     </div>
                 </div>
 
-                
+                <!-- LOGIC RELATED TO EDIT MOBIL -->
                 <?php
                 if (isset($_POST['edit'])) :
                     $c = new MobilController();
@@ -266,7 +257,7 @@ if ($_SESSION['isOwner'] == 1) {
                             <div class="modal-body">
                                 <form action="" method="post" id="edit_mobil">
                                     <input type="hidden" name="edit_id_mobil" value="<?= $dataEditMobil[0] ?>">
-                                    
+
                                     <div class="form-floating">
                                         <input type="text" class="form-control" id="car_name" placeholder="Nama Mobil" name="nama_mobil" value="<?= $dataEditMobil[1] ?>">
                                         <label for="car_name">Nama Mobil</label>
@@ -278,7 +269,7 @@ if ($_SESSION['isOwner'] == 1) {
                                     </div>
                                     <br>
                                     <div class="mb-3">
-                                        <label for="selTransmisi" class="form-label">Jenis Transmis</label>
+                                        <label for="selTransmisi" class="form-label">Jenis Transmisi</label>
                                         <select class="form-select" aria-label="Default select example" id="selTransmisi" name="transmisi" required>
                                             <option>Pilih jenis transmisi</option>
                                             <option value="automatic" <?php echo $dataEditMobil[3] == 'automatic' ? 'selected' : ''; ?>>Automatic</option>
@@ -331,7 +322,7 @@ if ($_SESSION['isOwner'] == 1) {
                         </div>
                     </div>
                 </div>
-                
+
                 <script>
                     document.getElementById("edit_mobil").addEventListener("submit", function(e) {
                         e.preventDefault();
@@ -365,13 +356,52 @@ if ($_SESSION['isOwner'] == 1) {
                             xhr.open("POST", "<?= base_url ?>/mobil/edit_then_update", true);
                             xhr.send(formData);
                         }
+
+
                     });
                 </script>
 
+                <!-- LOGIC RELATED TO DELETE MOBIL -->
         </div>
 
     <?php endif; ?>
     </div>
 
+    <script>
+        function showDeleteConfirm(param) {
+            // console.log(param);
+
+            Swal.fire({
+                title: 'Konfirmasi Penghapusan',
+                text: 'Apakah Anda ingin menghapus data mobil ini?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Iya',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Berhasil',
+                        text: 'Data Mobil Berhasil Dihapus',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            var xhr = new XMLHttpRequest();
+                            var formData = new FormData();
+                            formData.append("manipulate_id_mobil", param);
+
+                            xhr.open("POST", "<?= base_url ?>/mobil/delete_confirm", true);
+                            xhr.send(formData);
+
+                            window.location.href = "<?= base_url ?>/mobil";
+                        }
+                    })
+                } else window.location.href = "<?= base_url ?>/mobil";
+            });
+        }
+    </script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script> -->
 </body>

@@ -99,4 +99,10 @@ class MobilModel {
         // $result = true;
         return $result ?? false;
     }
+
+    public function delete_mobil($id_mobil) {
+        $result = $this->db->db()->query("DELETE FROM mobil WHERE id_mobil='$id_mobil'");
+
+        return $result ?? false;
+    }
 }
