@@ -7,7 +7,7 @@
     if (isset($_POST['login'])) {
 
         $p_username = $_POST['username'];
-        $p_password = $_POST['password'];
+        $p_password = md5($_POST['password']);
 
         $query = "SELECT cekLoginPegawai('$p_username', '$p_password') AS cekLoginPegawai";
 
