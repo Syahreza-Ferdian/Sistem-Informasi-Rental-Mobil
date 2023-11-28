@@ -15,7 +15,14 @@
         $is_valid = mysqli_fetch_assoc($cek_kredensial);
 
         if ($cek_kredensial && $is_valid['cekLoginPegawai'] == 1) {
-            $user = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT id_pegawai, username, isOwner FROM pegawai WHERE username = '$p_username'"));
+            $user = mysqli_fetch_assoc(mysqli_query($koneksi, "SELECT id_pegawai, username, isOwner, login_activity FROM pegawai WHERE username = '$p_username'"));
+            $current_date = date('Y-m-d H:i:s');
+            $curr_login_act = $user['login_activity'] + 1;
+            $query = "UPDATE pegawai SET lastLogin = '$current_date' WHERE id_pegawai = " .$user['id_pegawai'];
+            $updateLastLogin = mysqli_query($koneksi, $query);
+            $query = "UPDATE pegawai SET login_activity = '$curr_login_act' WHERE id_pegawai = " .$user['id_pegawai'];
+            mysqli_query($koneksi, $query);
+
             $resUser = $user['id_pegawai'];
             $isOwner = $user['isOwner'];
 

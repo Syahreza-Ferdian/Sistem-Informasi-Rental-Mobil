@@ -43,7 +43,7 @@
                         <a class="list-group-item list-group-item-action p-3" href="?page=transaksi"><div class="row"><div class="col-2"><i class="fa-solid fa-sack-dollar fa-xl"></i></div><div class="col"><span>Transaksi</span></div></div></a>
                         <a class="list-group-item list-group-item-action p-3" href="?page=pegawai"><div class="row"><div class="col-2"><i class="fa-solid fa-briefcase fa-xl"></i></div><div class="col"><span>Pegawai</span></div></div></a>
                         <a class="list-group-item list-group-item-action p-3" href="?page=customer"><div class="row"><div class="col-2"><i class="fa-solid fa-users fa-xl"></i></div><div class="col"><span>Customer Details</span></div></div></a>
-                        <a class="list-group-item list-group-item-action p-3" href="logout.php"><div class="row"><div class="col-2"><i class="fa-solid fa-right-from-bracket fa-xl"></i></div><div class="col"><span>Logout</span></div></div></a>
+                        <a class="list-group-item list-group-item-action p-3" href="logout.php" onclick="localStorage.removeItem('activeTabId')"><div class="row"><div class="col-2"><i class="fa-solid fa-right-from-bracket fa-xl"></i></div><div class="col"><span>Logout</span></div></div></a>
                     </div>
                 </div>
                 <div class="offcanvas-footer">
@@ -62,7 +62,7 @@
                                     <i class="fa-solid fa-bars fa-lg"></i>
                                 </button>
 
-                                <div class="user-name">
+                                <div class="user-name me-3">
                                     <i class="fa-solid fa-user fa-xl"></i>
                                     <span style="font-weight: bold; margin-left: 0.5rem; margin-right: 0.5rem;"><?= $_SESSION['username'] ?></span>
                                 </div>

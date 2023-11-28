@@ -33,9 +33,6 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
             $query = "DELETE FROM mobil WHERE id_mobil='$id_mobil'";
             $deletionRes = mysqli_query($koneksi, $query);
         ?>
-        ?>
-
-            ?>
 
             <script>
                 window.location.href = "index.php?page=daftar_mobil";
@@ -46,7 +43,7 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
     <div class="card">
         <div class="card-header">
             <h2>Daftar Kendaraan</h2>
-            <div class="float-lg-end mb-3">
+            <div class="float-lg-end mb-3 w-25">
                 <form action="" method="get">
                     <div class="input-group input-group">
                         <input type="hidden" name="page" value="daftar_mobil">
@@ -61,7 +58,7 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
             if (isset($_GET['cari_mobil'])):
                 $searchParam = $_GET['cari_mobil'];
 
-                $query = "SELECT M.id_mobil, M.nama_mobil, M.tahun, M.transmisi, M.plat_nomor, JM.jenis, M.kapasitas_penumpang, M.harga_sewa, M.status
+                $query = "SELECT M.id_mobil, M.nama_mobil, M.tahun, JM.jenis, M.status
                 FROM mobil M
                 INNER JOIN jenis_mobil JM ON M.id_jenis = JM.id_jenis
                 WHERE M.nama_mobil LIKE CONCAT('%', '$searchParam', '%')
@@ -81,54 +78,54 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
         <div class="card-body table-responsive">
             <?php
                 if (!$result): ?>
-                    <div class="container text-center">Data tidak ditemukan</div>
+                    <div class="container text-center"><strong>Data tidak ditemukan</strong></div>
 
             <?php elseif ($_GET['cari_mobil'] ?? false): ?>
                 <div class="container-fluid fs-5 mb-4"><strong>Hasil pencarian untuk '<?=$_GET['cari_mobil'] ?>' :</strong></div>
             <?php endif; ?>
 
             <?php if ($result): ?>
-            <table class="table table-hover table-striped">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Nama Mobil</th>
-                        <th>Tahun</th>
-                        <th>Transmisi</th>
-                        <th>Plat Nomor</th>
-                        <th>Jenis Mobil</th>
-                        <th style="width: 12%;">Kapasitas Penumpang</th>
-                        <th>Harga Sewa</th>
-                        <th>Status</th>
-                        <th style="width: 4%;"></th>
-                        <th style="width: 4%;" <?php echo $hiddenFromPegawai ? 'hidden' : '' ?>></th>
-                        <th style="width: 5%;" <?php echo $hiddenFromPegawai ? 'hidden' : '' ?>></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $count = 0;
+                <table class="table table-hover table-striped table-sm">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Mobil</th>
+                            <th>Tahun</th>
+                            <th>Jenis Mobil</th>
+                            <th>Status</th>
+                            <th style="width: 4%;"></th>
+                            <th style="width: 4%;" <?php echo $hiddenFromPegawai ? 'hidden' : '' ?>></th>
+                            <th style="width: 5%;" <?php echo $hiddenFromPegawai ? 'hidden' : '' ?>></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        $count = 0;
 
-                    foreach ($result as $row) {
-                        echo "<tr><td>" . ++$count . "</td>";
-                        echo "<td>" . $row[1] . "</td>";
-                        echo "<td>" . $row[2] . "</td>";
-                        echo "<td>" . ucwords($row[3]) . "</td>";
-                        echo "<td>" . $row[4] . "</td>";
-                        echo "<td>" . $row[5] . "</td>";
-                        echo "<td>" . $row[6] . "</td>";
-                        echo "<td>" . $row[7] . "</td>";
-                        echo "<td>" . ucwords($row[8]) . "</td>";
-                        echo '<form action="" method="post">';
-                        echo '<input type="text" name="manipulate_id_mobil" value="' . $row[0] . '" style="display: none;">';
-                        echo '<td><button type="submit" class="btn btn-primary btn-sm" name="details">Details</button></td>';
-                        echo '<td><button type="submit" class="btn btn-warning btn-sm" name="edit" ', $hiddenFromPegawai ? 'hidden' : '', '><i class="fa-solid fa-pen fa-2xs"></i> Edit</button></td>';
-                        echo '<td><button type="submit" class="btn btn-danger btn-sm" name="delete" ', $hiddenFromPegawai ? 'hidden' : '', '><i class="fa-solid fa-trash-can fa-2xs"></i> Delete</button></td>';
-                        echo '</form></tr>';
-                    }
-                    ?>
-                </tbody>
-            </table>
+                        $statusBadge;
+                        foreach ($result as $row) {
+                            if ($row[4] == 'ready') {
+                                $statusBadge = "success";
+                            }
+                            elseif ($row[4] == 'not ready') {
+                                $statusBadge = 'warning';
+                            }
+
+                            echo "<tr><td>" . ++$count . "</td>";
+                            echo "<td>" . $row[1] . "</td>";
+                            echo "<td>" . $row[2] . "</td>";
+                            echo "<td>" . $row[3] . "</td>";
+                            echo '<td><span class="badge text-bg-' . $statusBadge . '">' . ucwords($row[4]) . '</span></td>';
+                            echo '<form action="" method="post">';
+                            echo '<input type="text" name="manipulate_id_mobil" value="' . $row[0] . '" style="display: none;">';
+                            echo '<td><button type="submit" class="btn btn-primary btn-sm" name="details">Details</button></td>';
+                            echo '<td><button type="submit" class="btn btn-warning btn-sm" name="edit" ', $hiddenFromPegawai ? 'hidden' : '', '><i class="fa-solid fa-pen fa-2xs"></i> Edit</button></td>';
+                            echo '<td><button type="submit" class="btn btn-danger btn-sm" name="delete" ', $hiddenFromPegawai ? 'hidden' : '', '><i class="fa-solid fa-trash-can fa-2xs"></i> Delete</button></td>';
+                            echo '</form></tr>';
+                        }
+                        ?>
+                    </tbody>
+                </table>
             <?php endif; ?>
 
             <!-- MODAL TAMBAH MOBIL -->
@@ -142,7 +139,7 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
                         </div>
 
                         <div class="modal-body">
-                            <form action="" method="POST">
+                            <form action="" method="POST" enctype="multipart/form-data">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="car_name" placeholder="Nama Mobil" name="nama_mobil" required>
                                     <label for="car_name">Nama Mobil</label>
@@ -197,6 +194,11 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
                                         <option value="not ready">Not Ready</option>
                                     </select>
                                 </div>
+                                <br>
+                                <div class="mb-3">
+                                    <label for="foto">Tambahkan Foto Mobil (Opsional)</label>
+                                    <input type="file" class="form-control" id="foto" placeholder="Foto Mobil" name="foto_mobil" accept="image/*">
+                                </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancel">Batal</button>
                                     <button class="btn btn-primary" type="submit" name="submit" value="Submit" id="save">Simpan</button>
@@ -233,7 +235,7 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
                         </div>
 
                         <div class="modal-body">
-                            <form action="" method="post">
+                            <form action="" method="post" enctype="multipart/form-data">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="car_name" placeholder="Nama Mobil" name="nama_mobil" value="<?= $dataEditMobil[1] ?>">
                                     <label for="car_name">Nama Mobil</label>
@@ -288,6 +290,11 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
                                         <option value="not ready" <?php echo $dataEditMobil[8] == 'not ready' ? 'selected' : ''; ?>>Not Ready</option>
                                     </select>
                                 </div>
+                                <br>
+                                <div class="mb-3">
+                                    <label for="foto">Edit Foto Mobil</label>
+                                    <input type="file" class="form-control" id="foto" placeholder="Foto Mobil" name="foto_mobil_edit" accept="image/*">
+                                </div>
 
                                 <div class="modal-footer">
                                     <input type="text" name="edit_id_mobil" value="<?= $id_mobil ?>" style="display: none;">
@@ -324,20 +331,40 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
                 <div class="modal-dialog modal-dialog-centered modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h1 class="modal-title fs-5" id="formTambahMobil">Detail Mobil</h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <h1 class="modal-title fs-5" id="carDetails">Detail Mobil</h1>
+                            <a href=""><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></a>
                         </div>
 
                         <div class="modal-body">
-                            <div class="mb-3">
-                                Nama Mobil: <?= $data_detail_mobil['nama_mobil'] ?>
+                            <?php 
+                                if ($data_detail_mobil['foto'] != '-'): ?>
+                                    <img src="car_picts/<?= $data_detail_mobil['foto'] ?>" class="rounded mx-auto d-block img-thumbnail" alt="" style="width: auto; height: 300px;"><br>
+                                <?php endif;
+                            ?>
+                            <div class="row mb-0">
+                                <p class="col-sm-3 pt-0">Nama Mobil</p>
+                                <p class="col-sm-5">: <?= $data_detail_mobil['nama_mobil'] ?></p>
                             </div>
-                            <div class="mb-3">
-                                Diorder Sebanyak: <?= $diorder_brp_kali['HITUNG'] ?>
+                            <div class="row mb-0">
+                                <p class="col-sm-3 pt-0">Plat Nomor</p>
+                                <p class="col-sm-5">: <?= $data_detail_mobil['plat_nomor'] ?></p>
                             </div>
-                            <!-- <div class="mb-3">
-                                    <?= $data_detail_mobil['nama_mobil'] ?>
-                                </div> -->
+                            <div class="row mb-0">
+                                <p class="col-sm-3 pt-0">Transmisi</p>
+                                <p class="col-sm-5">: <?= ucwords($data_detail_mobil['transmisi']) ?></p>
+                            </div>
+                            <div class="row mb-0">
+                                <p class="col-sm-3 pt-0">Kapasitas Penumpang</p>
+                                <p class="col-sm-5">: <?= $data_detail_mobil['kapasitas_penumpang'] ?></p>
+                            </div>
+                            <div class="row mb-0">
+                                <p class="col-sm-3 pt-0">Harga Sewa</p>
+                                <p class="col-sm-5">: Rp <?= number_format($data_detail_mobil['harga_sewa'], 2, '.', ',') ?></p>
+                            </div>
+                            <div class="row mb-0">
+                                <p class="col-sm-3 pt-0">Diorder Sebanyak</p>
+                                <p class="col-sm-5">: <?= $diorder_brp_kali['HITUNG'] ?> kali</p>
+                            </div>
                         </div>
 
                         <div class="modal-footer">
@@ -361,9 +388,20 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
         $kapasitasPenumpang = $_POST['kapasitas_pnp'];
         $hargaSewa = $_POST['harga_sewa'];
         $status = $_POST['status_mobil'];
+        $foto = '-';
+
+        if (isset($_FILES['foto_mobil']['tmp_name'])) {
+            $file = $_FILES['foto_mobil']['tmp_name'];
+
+            $file_name = $_FILES['foto_mobil']['name'];
+
+            if (move_uploaded_file($file, './car_picts/' . $file_name)) {
+                $foto = $file_name;
+            }
+        }
 
         // echo $transmisi;
-        $query = "CALL TambahMobilBaru('$namaMobil', '$tahun', '$platNomor', '$jenisMobil', '$kapasitasPenumpang', '$hargaSewa', '-', '$status', '$transmisi')";
+        $query = "CALL TambahMobilBaru('$namaMobil', '$tahun', '$platNomor', '$jenisMobil', '$kapasitasPenumpang', '$hargaSewa', '$foto', '$status', '$transmisi')";
         $result = mysqli_query($koneksi, $query);
     ?>
         <!-- SWEETALERT Berhasil Menambahkan Data -->
@@ -391,8 +429,34 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
         $kapasitasPenumpang = $_POST['kapasitas_pnp'];
         $hargaSewa = $_POST['harga_sewa'];
         $status = $_POST['status_mobil'];
-
         $id_mobil_to_edit = $_POST['edit_id_mobil'];
+
+        $query = "SELECT foto FROM MOBIL WHERE id_mobil =" .$id_mobil_to_edit;
+        $result = mysqli_fetch_row(mysqli_query($koneksi, $query));
+
+        if (isset($_FILES['foto_mobil_edit']['tmp_name'])) {
+            $folder_path = "./car_picts/";
+            $file = $_FILES['foto_mobil_edit']['tmp_name'];
+            $file_name = $_FILES['foto_mobil_edit']['name'];
+
+            if ($result[0] == '-') {
+                if (move_uploaded_file($file, $folder_path . $file_name)) {
+                    $foto = $file_name;
+                }
+            } else {
+                if (file_exists($folder_path . $result[0])) {
+                    unlink($folder_path . $result[0]);
+                }
+
+                if (move_uploaded_file($file, $folder_path . $file_name)) {
+                    $foto = $file_name;
+                }
+            }
+
+            $query = "UPDATE MOBIL SET foto = '$foto' WHERE id_mobil = '$id_mobil_to_edit'";
+            $result = mysqli_query($koneksi, $query);
+        }
+
         $query = "CALL UpdateDataMobil ('$id_mobil_to_edit', '$namaMobil', '$tahun', '$transmisi', '$platNomor', '$jenisMobil', '$kapasitasPenumpang', '$hargaSewa', '$status')";
         $result = mysqli_query($koneksi, $query);
 
