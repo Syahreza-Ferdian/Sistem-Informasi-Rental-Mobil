@@ -30,6 +30,18 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
     <?php
         if (isset($_GET['confirmDelete'])) :
             $id_mobil = $_GET['idMobil'];
+            $query = "SELECT foto FROM MOBIL WHERE id_mobil =" .$id_mobil;
+            $result = mysqli_fetch_row(mysqli_query($koneksi, $query));
+            
+            if ($result[0] == '-') {
+                
+            } else {
+                $folder_path = "./car_picts/";
+                if (file_exists($folder_path . $result[0])) {
+                    unlink($folder_path . $result[0]);
+                }
+            }
+
             $query = "DELETE FROM mobil WHERE id_mobil='$id_mobil'";
             $deletionRes = mysqli_query($koneksi, $query);
         ?>
@@ -119,8 +131,8 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
                             echo '<form action="" method="post">';
                             echo '<input type="text" name="manipulate_id_mobil" value="' . $row[0] . '" style="display: none;">';
                             echo '<td><button type="submit" class="btn btn-primary btn-sm" name="details">Details</button></td>';
-                            echo '<td><button type="submit" class="btn btn-warning btn-sm" name="edit" ', $hiddenFromPegawai ? 'hidden' : '', '><i class="fa-solid fa-pen fa-2xs"></i> Edit</button></td>';
-                            echo '<td><button type="submit" class="btn btn-danger btn-sm" name="delete" ', $hiddenFromPegawai ? 'hidden' : '', '><i class="fa-solid fa-trash-can fa-2xs"></i> Delete</button></td>';
+                            echo $hiddenFromPegawai ? '' : '<td><button type="submit" class="btn btn-warning btn-sm" name="edit"><i class="fa-solid fa-pen fa-2xs"></i> Edit</button></td>';
+                            echo $hiddenFromPegawai ? '' : '<td><button type="submit" class="btn btn-danger btn-sm" name="delete"><i class="fa-solid fa-trash-can fa-2xs"></i> Delete</button></td>';
                             echo '</form></tr>';
                         }
                         ?>
@@ -129,7 +141,8 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
             <?php endif; ?>
 
             <!-- MODAL TAMBAH MOBIL -->
-            <button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#formTambahMobil" <?php echo isset($_GET['cari_mobil']) || $hiddenFromPegawai ? 'hidden' : '' ?> ><strong>Tambah Mobil</strong> <i class="fa-solid fa-plus fa-lg" style="margin-left: 0.2rem;"></i></button>
+            
+            <?php echo isset($_GET['cari_mobil']) || $hiddenFromPegawai ? '' : '<button class="btn btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#formTambahMobil"><strong>Tambah Mobil</strong> <i class="fa-solid fa-plus fa-lg" style="margin-left: 0.2rem;"></i></button>' ?>
             <div class="modal fade" id="formTambahMobil" tabindex="-1" aria-labelledby="formTambahMobilLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                     <div class="modal-content">
@@ -434,7 +447,7 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
         $query = "SELECT foto FROM MOBIL WHERE id_mobil =" .$id_mobil_to_edit;
         $result = mysqli_fetch_row(mysqli_query($koneksi, $query));
 
-        if (isset($_FILES['foto_mobil_edit']['tmp_name'])) {
+        if (is_uploaded_file($_FILES['foto_mobil_edit']['tmp_name'])) {
             $folder_path = "./car_picts/";
             $file = $_FILES['foto_mobil_edit']['tmp_name'];
             $file_name = $_FILES['foto_mobil_edit']['name'];
@@ -447,7 +460,6 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
                 if (file_exists($folder_path . $result[0])) {
                     unlink($folder_path . $result[0]);
                 }
-
                 if (move_uploaded_file($file, $folder_path . $file_name)) {
                     $foto = $file_name;
                 }

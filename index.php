@@ -58,7 +58,7 @@ include "nav.php";
             <div class="row mb-4">
                 <div class="col">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header bg-primary">
                             <h5 class="fw-bold d-inline">Jenis Kendaraan </h5><i class="fa-solid fa-car fa-xl"></i>
                         </div>
 
@@ -71,7 +71,7 @@ include "nav.php";
                 </div>
                 <div class="col">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header bg-primary">
                             <h5 class="fw-bold d-inline">Status Kendaraan </h5><i class="fa-solid fa-warehouse fa-xl"></i>
                         </div>
 
@@ -203,7 +203,7 @@ include "nav.php";
             <div class="row mb-4">
                 <div class="col-5">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header bg-primary">
                             <h5 class="fw-bold d-inline">Transactions </h5><i class="fa-solid fa-money-bill-transfer fa-xl"></i>
                         </div>
 
@@ -216,7 +216,7 @@ include "nav.php";
                 </div>
                 <div class="col">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header bg-primary">
                             <h5 class="fw-bold d-inline">Employee Login Activity </h5><i class="fa-solid fa-briefcase fa-xl"></i>
                         </div>
 

@@ -16,7 +16,7 @@
 
         <div class="card mt-3">
             <div class="card-header text-center">
-                <h2>Customers</h2>
+                <h2 class="mt-1">Customers</h2>
                 <div class="float-lg-end mb-3 w-25">
                     <form action="" method="get">
                         <div class="input-group input-group">
@@ -44,7 +44,7 @@
                     $result = mysqli_fetch_all(mysqli_query($koneksi, $query));
                 endif;
             ?>
-
+            
             <div class="card-body">
                 <?php if (!$result): ?>
                     <div class="container text-center"><strong>Data tidak ditemukan</strong></div>

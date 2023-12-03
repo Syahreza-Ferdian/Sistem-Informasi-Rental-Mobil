@@ -7,6 +7,12 @@
     } else {
         @header("Location: index.php?page=pegawai");
     }
+    if ($_SESSION['isOwner'] == 1) {
+        $hiddenFromPegawai = false;
+    }
+    else {
+        $hiddenFromPegawai = true;
+    }
 ?>
 
 <!DOCTYPE html>
@@ -121,7 +127,7 @@
                                     <th>Nomor Telp</th>
                                     <th>Current Car</th>
                                     <th>Status</th>
-                                    <th>Action</th>
+                                    <?= $hiddenFromPegawai ? '' : '<th>Action</th>' ?>
                                 </tr>
                             </thead>
 
@@ -154,7 +160,7 @@
                                         echo '<td><span class="badge text-bg-' . $badgeStatus . '">' . ucwords($row[3]) . '</span></td>';
                                         echo '<form action="" method="POST">';
                                         echo '<input type="text" name="driver_id" value="' . $row[0] . '" style="display: none;">';
-                                        echo '<td><button type="submit" name="driver_del" class="btn btn-danger btn-sm">Remove</button></td>';
+                                        echo $hiddenFromPegawai ? '' : '<td><button type="submit" name="driver_del" class="btn btn-danger btn-sm">Remove</button></td>';
                                         echo '</form>';
                                         echo "</tr>";
                                     }
@@ -208,7 +214,7 @@
                                 <th>Account Username</th>
                                 <th>Last Login</th>
                                 <th>Additional Role</th>
-                                <th></th>
+                                <?= $hiddenFromPegawai ? '': '<th></th>' ?>
                             </thead>
 
                             <tbody>
@@ -221,6 +227,9 @@
                                         $badgeStatus;
                                         $role_text;
 
+                                        $query = "SELECT COUNT(*) FROM driver WHERE id_pegawai = " . $row[0];
+                                        $cekDriver = mysqli_fetch_row(mysqli_query($koneksi, $query));
+
                                         if ($row[5] == 0) {
                                             $badgeStatus = 'secondary';
                                             $role_text = 'Pegawai Biasa';
@@ -230,26 +239,33 @@
                                             $role_text = 'Owner';
                                         }
 
+                                        if ($cekDriver[0] > 0) {
+                                            $isDriver = true;
+                                        } else {
+                                            $isDriver = false;
+                                        }
+
                                         echo "<tr><td>" .++$count ."</td>";
                                         echo "<td>" .$row[1] ."</td>";
                                         echo "<td>" .$row[4] ."</td>";
                                         echo "<td>" .$row[2] ."</td>";
                                         echo "<td>" .($row[6] ?? "<em>Tidak terdeteksi</em>")."</td>";
-                                        echo '<td><span class="badge text-bg-' . $badgeStatus . '">' . $role_text . '</span></td>';
-                                        echo '<td><button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">Action</button>';
-                                        echo '<ul class="dropdown-menu">';
-                                        echo '<li><a class="dropdown-item" href="index.php?page=pegawai&act=add_driver&emp_id=' .$row[0] .'">Tugaskan Sebagai Driver</a></li>';
-                                        echo '<li><hr class="dropdown-divider"></li>';
-                                        echo '<li><a class="dropdown-item" href="index.php?page=pegawai&act=fired&emp_id=' .$row[0] .'">Pecat Pegawai</a></li>';
-                                        echo '</ul></td>';
+                                        echo '<td><span class="badge text-bg-' . $badgeStatus . '">' . $role_text . '</span>' .($isDriver ? ' <span class="badge text-bg-primary">Driver</span>' : '').'</td>';
+                                        echo $hiddenFromPegawai ? '' : '
+                                        <td><button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-bs-toggle="dropdown" aria-expanded="false">Action</button>
+                                        <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item '. ($isDriver ? 'disabled' : '') .'" href="index.php?page=pegawai&act=add_driver&emp_id=' .$row[0] .'">Tugaskan Sebagai Driver</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" href="index.php?page=pegawai&act=fired&emp_id=' .$row[0] .'">Pecat Pegawai</a></li>
+                                        </ul></td>
+                                        ';
                                     }
                                 ?>
                             </tbody>
                         </table>
 
                         <!-- MODAL TAMBAH PEGAWAI -->
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#form-tambah-pegawai"><strong>Tambah pegawai baru</strong> <i class="fa-solid fa-plus fa-lg"></i> </button>
-
+                        <?= $hiddenFromPegawai ? '' : '<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#form-tambah-pegawai"><strong>Tambah pegawai baru</strong> <i class="fa-solid fa-plus fa-lg"></i> </button>' ?>
                         <div class="modal fade" id="form-tambah-pegawai" tabindex="-1" aria-labelledby="form-tambah-pegawai" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
                                 <div class="modal-content">

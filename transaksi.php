@@ -24,33 +24,33 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
 
 <body>
     <?php
-        if (isset($_GET['act'])):
-            $action = $_GET['act'];
-            $no_faktur = $_GET['no_faktur'];
-            if ($action == 'finish'):
-                $query = "CALL PengembalianMobil('$no_faktur')";
-                $result = mysqli_query($koneksi, $query);
-            elseif ($action == 'active'):
-                $query = "CALL UpdateStatusTransaksiOnActive('$no_faktur')";
-                $result = mysqli_query($koneksi, $query);
-            elseif ($action == 'cancel'):
-                $query = "CALL CancelTransaksiSewa('$no_faktur')";
-                $result = mysqli_query($koneksi, $query);
-            endif;
-        ?>
-            <script>
-                Swal.fire({
-                    title: 'Berhasil',
-                    text: 'Transaksi berhasil diupdate',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = "index.php?page=transaksi";
-                    }
-                })
-            </script>
-        <?php endif;
+    if (isset($_GET['act'])) :
+        $action = $_GET['act'];
+        $no_faktur = $_GET['no_faktur'];
+        if ($action == 'finish') :
+            $query = "CALL PengembalianMobil('$no_faktur')";
+            $result = mysqli_query($koneksi, $query);
+        elseif ($action == 'active') :
+            $query = "CALL UpdateStatusTransaksiOnActive('$no_faktur')";
+            $result = mysqli_query($koneksi, $query);
+        elseif ($action == 'cancel') :
+            $query = "CALL CancelTransaksiSewa('$no_faktur')";
+            $result = mysqli_query($koneksi, $query);
+        endif;
+    ?>
+        <script>
+            Swal.fire({
+                title: 'Berhasil',
+                text: 'Transaksi berhasil diupdate',
+                icon: 'success',
+                confirmButtonText: 'OK'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "index.php?page=transaksi";
+                }
+            })
+        </script>
+    <?php endif;
     ?>
 
     <div class="container">
@@ -233,6 +233,97 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
                     </div>
                 </form>
 
+                <?php
+                if (isset($_POST['simpan'])) {
+                    $c_name = $_POST['nama_customer'];
+                    $c_nik = $_POST['nik_customer'];
+                    $c_addr = $_POST['alamat_customer'];
+                    $c_telp = $_POST['nomor_telp_customer'];
+                    $query = "SELECT id_customer
+                        FROM CUSTOMER
+                        WHERE nama LIKE CONCAT('%', '$c_name', '%')
+                        AND nik LIKE CONCAT('%', '$c_nik', '%')";
+                    $result = mysqli_fetch_row(mysqli_query($koneksi, $query));
+
+                    $c_id = $result[0] ?? -1;
+
+                    if ($c_id == -1) {
+                        $query = "INSERT INTO CUSTOMER(nama, alamat, no_telepon, nik) VALUES('$c_name', '$c_addr', '$c_telp', '$c_nik')";
+                        $res = mysqli_query($koneksi, $query);
+                        $c_id = mysqli_insert_id($koneksi);
+                    }
+
+                    $car_id = $_POST['car_select'];
+                    $duration = $_POST['durasi_sewa'];
+                    $tanggal_sewa = $_POST['tanggal_sewa'];
+                    $status_pengambilan = $_POST['status_pengambilan'];
+                    $status_lepas_kunci = $_POST['status_lepas_kunci'];
+                    $id_driver = $_POST['driver_id'];
+
+                    $dateTime = new DateTime($tanggal_sewa);
+                    $f_tanggal_sewa = $dateTime->format('Y-m-d H:i:s');
+
+                    $tanggal_transaksi = date('Y-m-d H:i:s');
+                    $query = "CALL SewaMobil('$c_id', '$car_id', '$tanggal_transaksi', '$duration', '$f_tanggal_sewa', '$status_pengambilan', '$status_lepas_kunci', '$id_driver')";
+                    $result = mysqli_query($koneksi, $query);
+
+                    if ($result) : ?>
+                        <script>
+                            Swal.fire({
+                                title: 'Berhasil',
+                                text: 'Berhasil menambahkan transaksi baru',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = "index.php?page=transaksi";
+                                }
+                            })
+                        </script>
+
+                <?php endif;
+                }
+                ?>
+
+
+                <script>
+                    <?php
+                    $query = "SELECT * from view_driver_tersedia";
+                    $result = mysqli_fetch_all(mysqli_query($koneksi, $query));
+                    $id = array();
+                    $name = array();
+                    foreach ($result as $row) {
+                        $id[] = $row[0];
+                        $name[$row[0]] = $row[1];
+                    }
+                    ?>
+
+                    function randomAssignDriver() {
+                        const ids = <?= json_encode($id) ?>;
+                        const random_id = Math.floor(Math.random() * ids.length);
+                        return ids[random_id].toString();
+                    }
+
+                    document.getElementById("check").addEventListener("change", () => {
+                        const radio1 = document.getElementById("flexRadioDefault3");
+                        const radio2 = document.getElementById("flexRadioDefault4");
+                        const driver_id_hidden_input = document.getElementById("driver_id_hidden");
+                        const assignParagraph = document.getElementById('assign');
+
+                        if (radio1.checked) {
+                            assignParagraph.textContent = "";
+                            driver_id_hidden_input.value = 1;
+                        }
+                        if (radio2.checked) {
+                            const randomDriverID = randomAssignDriver();
+                            const driverName = <?= json_encode($name) ?>[randomDriverID];
+
+                            assignParagraph.textContent = "Automatically assign driver ID: " + randomDriverID + " - " + driverName;
+                            driver_id_hidden_input.value = parseInt(randomDriverID);
+                        }
+                    });
+                </script>
+
                 <!-- MODAL DETAILS -->
                 <?php
                 if (isset($_POST['details'])) :
@@ -312,7 +403,9 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="index.php?page=transaksi&act=finish&no_faktur=<?= $result[1] ?>">Finish Transaction</a></li>
                                     <li><a class="dropdown-item" href="index.php?page=transaksi&act=active&no_faktur=<?= $result[1] ?>">Transaction is Active</a></li>
-                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
                                     <li><a class="dropdown-item" href="index.php?page=transaksi&act=cancel&no_faktur=<?= $result[1] ?>">Cancel Transaction</a></li>
                                 </ul>
                             </div>
@@ -327,97 +420,6 @@ if (!isset($_SESSION['password']) && !isset($_SESSION['username'])) {
             </div>
         </div>
     </div>
-
-    <?php
-    if (isset($_POST['simpan'])) {
-        $c_name = $_POST['nama_customer'];
-        $c_nik = $_POST['nik_customer'];
-        $c_addr = $_POST['alamat_customer'];
-        $c_telp = $_POST['nomor_telp_customer'];
-        $query = "SELECT id_customer
-                        FROM CUSTOMER
-                        WHERE nama LIKE CONCAT('%', '$c_name', '%')
-                        AND nik LIKE CONCAT('%', '$c_nik', '%')";
-        $result = mysqli_fetch_row(mysqli_query($koneksi, $query));
-
-        $c_id = $result[0] ?? -1;
-
-        if ($c_id == -1) {
-            $query = "INSERT INTO CUSTOMER(nama, alamat, no_telepon, nik) VALUES('$c_name', '$c_addr', '$c_telp', '$c_nik')";
-            $res = mysqli_query($koneksi, $query);
-            $c_id = mysqli_insert_id($koneksi);
-        }
-
-        $car_id = $_POST['car_select'];
-        $duration = $_POST['durasi_sewa'];
-        $tanggal_sewa = $_POST['tanggal_sewa'];
-        $status_pengambilan = $_POST['status_pengambilan'];
-        $status_lepas_kunci = $_POST['status_lepas_kunci'];
-        $id_driver = $_POST['driver_id'];
-
-        $dateTime = new DateTime($tanggal_sewa);
-        $f_tanggal_sewa = $dateTime->format('Y-m-d H:i:s');
-
-        $tanggal_transaksi = date('Y-m-d H:i:s');
-        $query = "CALL SewaMobil('$c_id', '$car_id', '$tanggal_transaksi', '$duration', '$f_tanggal_sewa', '$status_pengambilan', '$status_lepas_kunci', '$id_driver')";
-        $result = mysqli_query($koneksi, $query);
-
-        if ($result) : ?>
-            <script>
-                Swal.fire({
-                    title: 'Berhasil',
-                    text: 'Berhasil menambahkan transaksi baru',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = "index.php?page=transaksi";
-                    }
-                })
-            </script>
-
-        <?php endif;
-    }
-    ?>
-
-
-    <script>
-        <?php
-        $query = "SELECT * from view_driver_tersedia";
-        $result = mysqli_fetch_all(mysqli_query($koneksi, $query));
-        $id = array();
-        $name = array();
-        foreach ($result as $row) {
-            $id[] = $row[0];
-            $name[$row[0]] = $row[1];
-        }
-        ?>
-
-        function randomAssignDriver() {
-            const ids = <?= json_encode($id) ?>;
-            const random_id = Math.floor(Math.random() * ids.length);
-            return ids[random_id].toString();
-        }
-
-        document.getElementById("check").addEventListener("change", () => {
-            const radio1 = document.getElementById("flexRadioDefault3");
-            const radio2 = document.getElementById("flexRadioDefault4");
-            const driver_id_hidden_input = document.getElementById("driver_id_hidden");
-            const assignParagraph = document.getElementById('assign');
-
-            if (radio1.checked) {
-                assignParagraph.textContent = "";
-                driver_id_hidden_input.value = 1;
-            }
-            if (radio2.checked) {
-                const randomDriverID = randomAssignDriver();
-                const driverName = <?= json_encode($name) ?>[randomDriverID];
-
-                assignParagraph.textContent = "Automatically assign driver ID: " + randomDriverID + " - " + driverName;
-                driver_id_hidden_input.value = parseInt(randomDriverID);
-            }
-        });
-    </script>
 </body>
 
 </html>
